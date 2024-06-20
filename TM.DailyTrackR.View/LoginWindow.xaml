@@ -5,13 +5,61 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TM.DailyTrackR.View"
         mc:Ignorable="d"
-        Title="Topmotive TrackR" Height="450" Width="350">
+        Title="Topmotive TrackR" Height="500" Width="400"
+        ResizeMode="NoResize">
     <Grid>
-        <Button Width="100" 
-                Height="40" 
-                FontSize="16" 
-                Content="Login"
-                Command="{Binding LoginCommand}">
-        </Button>
+        <Grid.RowDefinitions>
+            <RowDefinition></RowDefinition>
+            <RowDefinition Height="auto"></RowDefinition>
+            <RowDefinition></RowDefinition>
+        </Grid.RowDefinitions>
+
+        <StackPanel Orientation="Vertical" 
+                    HorizontalAlignment="Center" 
+                    VerticalAlignment="Center">
+            <TextBlock FontSize="24"
+                   FontWeight="Bold"
+                   Text="Welcome to TrackR">
+            </TextBlock>
+            <TextBlock HorizontalAlignment="Center" 
+                       FontSize="20"
+                       Text="Please Sign In">
+            </TextBlock>
+        </StackPanel>
+
+        <StackPanel Width="300" 
+                    Grid.Row="1" 
+                    VerticalAlignment="Center">
+            <StackPanel>
+                <TextBlock FontSize="14" 
+                           Text="Username">
+                </TextBlock>
+                <TextBox MaxLength="30"
+                         Text="{Binding Username}"
+                         Margin="0, 4, 0, 0" 
+                         VerticalContentAlignment="Center" 
+                         FontSize="14" 
+                         Height="30">
+                </TextBox>
+            </StackPanel>
+            <StackPanel Margin="0, 20, 0, 0">
+                <TextBlock FontSize="14" 
+                           Text="Password">
+                </TextBlock>
+                <PasswordBox x:Name="PasswordBox" MaxLength="30"
+                             Margin="0, 4, 0, 0" 
+                             VerticalContentAlignment="Center" 
+                             FontSize="14" 
+                             Height="30">
+                </PasswordBox>
+            </StackPanel>
+            <Button Command="{Binding LoginCommand}" 
+                    CommandParameter="{Binding ElementName=PasswordBox}"
+                    Margin="0, 30, 0, 0" Width="120"
+                    Height="30"
+                    FontSize="14"
+                    Content="Login">
+            </Button>
+        </StackPanel>
     </Grid>
 </Window>

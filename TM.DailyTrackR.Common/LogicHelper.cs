@@ -8,10 +8,10 @@ public sealed class LogicHelper
 
     private LogicHelper()
     {
-        ExampleController = new ExampleController();
+        LoginController = new LoginController();
     }
 
     public static LogicHelper Instance { get { return Lazy.Value; } }
 
-    public ExampleController ExampleController { get; }
+    public LoginController LoginController { get; }
 }

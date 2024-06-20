@@ -1,20 +1,22 @@
 ﻿using Prism.Commands;
 using Prism.Mvvm;
+using System.Windows.Controls;
 using TM.DailyTrackR.Common;
+using TM.DailyTrackR.Logic;
 
 namespace TM.DailyTrackR.ViewModel;
 
-public class LoginWindowViewModel : BindableBase
+public sealed class LoginWindowViewModel : BindableBase
 {
+    private readonly LoginController loginController;
+
     private string username;
-    private string password;
-    private DelegateCommand loginCommand;
 
     public LoginWindowViewModel()
     {
+        loginController = LogicHelper.Instance.LoginController;
         username = String.Empty;
-        password = String.Empty;
-        loginCommand = new DelegateCommand(Login, CanLogin);
+        LoginCommand = new DelegateCommand<PasswordBox>(Login);
     }
 
     public string Username
@@ -23,21 +25,43 @@ public class LoginWindowViewModel : BindableBase
         set => SetProperty(ref username, value);
     }
 
-    public string Password
+    public DelegateCommand<PasswordBox> LoginCommand { get; }
+
+    public void Login(PasswordBox passwordBox)
     {
-        get => password;
-        set => SetProperty(ref password, value);
+        var password = passwordBox.Password;
+
+        if (!CanLogin(username, password))
+        {
+            ShowInvalidPasswordDialog();
+            return;
+        }
+
+        if (!loginController.Login(username, password))
+        {
+            ShowInvalidPasswordDialog();
+            return;
+        }
+
+        SwitchToMainWindow();
     }
 
-    public DelegateCommand LoginCommand
+    public bool CanLogin(String username, String password)
     {
-        get => loginCommand;
+        if (username.Length == 0) return false;
+        if (password.Length == 0) return false;
+
+        return true;
     }
 
-    public void Login()
+    private void ShowInvalidPasswordDialog()
     {
 
     }
 
-    public bool CanLogin() => true;
+    private void SwitchToMainWindow()
+    {
+        ViewService.Instance.ShowWindow(new MainWindowViewModel());
+        ViewService.Instance.CloseWindow(this);
+    }
 }
