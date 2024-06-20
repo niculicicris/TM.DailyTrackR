@@ -4,69 +4,73 @@ using System.Linq;
 using System.Windows;
 using Prism.Mvvm;
 
-namespace TM.DailyTrackR.Common
+namespace TM.DailyTrackR.Common;
+
+public class ViewService
 {
-    public class ViewService
+    private static readonly Lazy<ViewService> lazy = new(() => new(), isThreadSafe: true);
+    private Dictionary<BindableBase, Window> openedWindows = new();
+    private Dictionary<Type, Type> registeredViews = new();
+
+    private ViewService() { }
+
+    public static ViewService Instance => lazy.Value;
+
+    public void RegisterView(Type viewModel, Type window)
     {
-        private static readonly Lazy<ViewService> lazy = new(() => new(), isThreadSafe: true);
-        private Dictionary<BindableBase, Window> openedWindows = new();
-        private Dictionary<Type, Type> registeredViews = new();
+        Instance.registeredViews[viewModel] = window;
+    }
 
-        private ViewService() { }
-
-        public static ViewService Instance => lazy.Value;
-
-        public void RegisterView(Type viewModel, Type window)
+    public void ShowDialog(BindableBase viewModel, BindableBase? parent = null, Type? parentViewModelType = null)
+    {
+        if (Instance.registeredViews.TryGetValue(viewModel.GetType(), out Type? windowType))
         {
-            Instance.registeredViews[viewModel] = window;
-        }
+            Window? window = Activator.CreateInstance(windowType) as Window;
 
-        public void ShowDialog(BindableBase viewModel, BindableBase? parent = null, Type? parentViewModelType = null)
-        {
-            if (Instance.registeredViews.TryGetValue(viewModel.GetType(), out Type? windowType))
+            if (window != null)
             {
-                Window? window = Activator.CreateInstance(windowType) as Window;
+                window.DataContext = viewModel;
 
-                if (window != null)
+                Instance.openedWindows[viewModel] = window;
+
+                if (parent != null)
                 {
-                    window.DataContext = viewModel;
-
-                    Instance.openedWindows[viewModel] = window;
-
-                    if (parent != null)
+                    if (Instance.openedWindows.TryGetValue(parent, out Window? parentWindow))
                     {
-                        if (Instance.openedWindows.TryGetValue(parent, out Window? parentWindow))
-                        {
-                            window.Owner = parentWindow;
-                        }
-                    }
-
-                    if (parent == null && parentViewModelType != null)
-                    {
-                        var parentWindow = Instance.openedWindows.FirstOrDefault(x => x.Key.GetType() == parentViewModelType).Value;
                         window.Owner = parentWindow;
                     }
-
-                    window.ShowDialog();
                 }
-            }
-        }
 
-        public void ShowWindow(BindableBase viewModel)
-        {
-            if (Instance.registeredViews.TryGetValue(viewModel.GetType(), out Type? windowType))
-            {
-                Window? window = Activator.CreateInstance(windowType) as Window;
-
-                if (window != null)
+                if (parent == null && parentViewModelType != null)
                 {
-                    window.DataContext = viewModel;
-
-                    Instance.openedWindows[viewModel] = window;
-
-                    window.Show();
+                    var parentWindow = Instance.openedWindows.FirstOrDefault(x => x.Key.GetType() == parentViewModelType).Value;
+                    window.Owner = parentWindow;
                 }
+
+                window.ShowDialog();
             }
         }
+    }
+
+    public void ShowWindow(BindableBase viewModel)
+    {
+        if (Instance.registeredViews.TryGetValue(viewModel.GetType(), out Type? windowType))
+        {
+            Window? window = Activator.CreateInstance(windowType) as Window;
+
+            if (window != null)
+            {
+                window.DataContext = viewModel;
+
+                Instance.openedWindows[viewModel] = window;
+
+                window.Show();
+            }
+        }
+    }
+
+    public void CloseWindow(BindableBase viewModel) 
+    {
+        openedWindows[viewModel]?.Close();
     }
 }

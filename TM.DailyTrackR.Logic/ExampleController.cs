@@ -1,31 +1,30 @@
 ﻿using System.Data.SqlClient;
 
-namespace TM.DailyTrackR.Logic
+namespace TM.DailyTrackR.Logic;
+
+public sealed class ExampleController
 {
-    public sealed class ExampleController
+    string connectionString = @"Server=.\TM_DAILY_TRACKR;Database=TRACKER_DATA;Integrated Security=true;";
+
+    public int GetDataExample()
     {
-        string connectionString = @"Server=.\TM_DAILY_TRACKR;Database=TRACKER_DATA;Integrated Security=true;";
+        string query = "SELECT @@VERSION";
 
-        public int GetDataExample()
+        using SqlConnection connection = new SqlConnection(connectionString);
+
+        try
         {
-            string query = "SELECT @@VERSION";
+            connection.Open();
 
-            using SqlConnection connection = new SqlConnection(connectionString);
-
-            try
-            {
-                connection.Open();
-
-                using SqlCommand command = new SqlCommand(query, connection);
-                string version = (string)command.ExecuteScalar();
-                System.Diagnostics.Debug.WriteLine("SQL Server Version: " + version);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("An error occurred: " + ex.Message);
-            }
-
-            return 0;
+            using SqlCommand command = new SqlCommand(query, connection);
+            string version = (string)command.ExecuteScalar();
+            System.Diagnostics.Debug.WriteLine("SQL Server Version: " + version);
         }
+        catch (Exception ex)
+        {
+            Console.WriteLine("An error occurred: " + ex.Message);
+        }
+
+        return 0;
     }
 }
