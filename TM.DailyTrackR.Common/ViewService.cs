@@ -72,5 +72,6 @@ public class ViewService
     public void CloseWindow(BindableBase viewModel) 
     {
         openedWindows[viewModel]?.Close();
+        openedWindows[viewModel] = null;
     }
 }

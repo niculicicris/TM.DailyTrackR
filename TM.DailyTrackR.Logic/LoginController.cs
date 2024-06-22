@@ -3,7 +3,7 @@
 public sealed class LoginController
 {
     private readonly string USERNAME = "admin";
-    private readonly string PASSWORD = "password";
+    private readonly string PASSWORD = "1234";
 
     public bool Login(String username, String password)
     {

@@ -27,7 +27,7 @@ public sealed class LoginWindowViewModel : BindableBase
 
     public DelegateCommand<PasswordBox> LoginCommand { get; }
 
-    public void Login(PasswordBox passwordBox)
+    private void Login(PasswordBox passwordBox)
     {
         var password = passwordBox.Password;
 
@@ -46,7 +46,7 @@ public sealed class LoginWindowViewModel : BindableBase
         SwitchToMainWindow();
     }
 
-    public bool CanLogin(String username, String password)
+    private bool CanLogin(String username, String password)
     {
         if (username.Length == 0) return false;
         if (password.Length == 0) return false;
@@ -56,7 +56,8 @@ public sealed class LoginWindowViewModel : BindableBase
 
     private void ShowInvalidPasswordDialog()
     {
-
+        string errorMessage = "The entered username or password is not correct!";
+        ViewService.Instance.ShowDialog(new ErrorWindowViewModel(errorMessage));
     }
 
     private void SwitchToMainWindow()
