@@ -11,6 +11,7 @@
     <Window.Resources>
         <Style TargetType="TextBlock">
             <Setter Property="Foreground" Value="#4a4a49"></Setter>
+            <Setter Property="FontSize" Value="14"></Setter>
         </Style>
         
         <Style x:Key="TitleStyle" TargetType="TextBlock">
@@ -45,7 +46,7 @@
         <Style x:Key="ButtonStyle" TargetType="Button">
             <Setter Property="Width" Value="90"></Setter>
             <Setter Property="Height" Value="35"></Setter>
-            <Setter Property="Background" Value="#245b9d"></Setter>
+            <Setter Property="Background" Value="#0078d7"></Setter>
             <Setter Property="Foreground" Value="#ffffff"></Setter>
             <Setter Property="FontSize" Value="14"></Setter>
             <Setter Property="Cursor" Value="Hand"></Setter>
@@ -63,7 +64,7 @@
 
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#215592"></Setter>
+                    <Setter Property="Background" Value="#0066b7"></Setter>
                 </Trigger>
             </Style.Triggers>
         </Style>
@@ -90,9 +91,7 @@
                     Grid.Row="1" 
                     VerticalAlignment="Center">
             <StackPanel>
-                <TextBlock FontSize="14" 
-                           Text="Username">
-                </TextBlock>
+                <TextBlock Text="Username"></TextBlock>
                 <TextBox Style="{StaticResource InputStyle}" 
                          MaxLength="30"
                          Text="{Binding Username}"
@@ -100,9 +99,7 @@
                 </TextBox>
             </StackPanel>
             <StackPanel Margin="0, 20, 0, 0">
-                <TextBlock FontSize="14" 
-                           Text="Password">
-                </TextBlock>
+                <TextBlock Text="Password"></TextBlock>
                 <PasswordBox x:Name="PasswordBox" 
                              Style="{StaticResource PasswordInputStyle}"
                              MaxLength="30"
