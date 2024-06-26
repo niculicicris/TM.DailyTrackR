@@ -162,9 +162,9 @@
 
         <Viewbox Style="{StaticResource CalendarSizeStyle}">
             <Calendar Style="{StaticResource CalendarStyle}"
-                      SelectedDate="{Binding Calendar.SelectedDate}" 
-                      DisplayDate="{Binding Calendar.SelectedDate}" 
-                      DisplayDateEnd="{Binding Calendar.CurrentDate, Mode=OneWay}">
+                      SelectedDate="{Binding SelectedDate}" 
+                      DisplayDate="{Binding SelectedDate}" 
+                      DisplayDateEnd="{Binding CurrentDate, Mode=OneWay}">
             </Calendar>
         </Viewbox>
         
@@ -186,7 +186,7 @@
                         
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                             <TextBlock Text="Activities Date: "></TextBlock>
-                            <TextBlock Text="{Binding Calendar.SelectedDate, StringFormat={}{0:dd/MM/yyyy}}"></TextBlock>
+                            <TextBlock Text="{Binding SelectedDate, StringFormat={}{0:dd/MM/yyyy}}"></TextBlock>
                         </StackPanel>
                         <Button Grid.Column="1"
                                 Style="{StaticResource AddButtonStyle}"
@@ -195,7 +195,7 @@
                     </Grid>
                     <DataGrid Grid.Row="1" 
                               Style="{StaticResource DataGridStyle}"
-                              ItemsSource="{Binding Activity.Activities, Mode=OneWay}"
+                              ItemsSource="{Binding DailyActivities, Mode=OneWay}"
                               IsReadOnly="True"
                               CanUserSortColumns="False"
                               AutoGenerateColumns="False">
@@ -203,27 +203,27 @@
                             <DataGridTextColumn HeaderStyle="{StaticResource FirstColumnHeaderStyle}" 
                                                 Header="No." 
                                                 Binding="{Binding Number}" 
-                                                Width="*">
+                                                Width="50">
                             </DataGridTextColumn>
                             <DataGridTextColumn HeaderStyle="{StaticResource ColumnHeaderStyle}"
                                                 Header="Project type" 
                                                 Binding="{Binding ProjectType}" 
-                                                Width="*">
+                                                Width="100">
                             </DataGridTextColumn>
                             <DataGridTextColumn HeaderStyle="{StaticResource ColumnHeaderStyle}"
                                                 Header="Task type" 
                                                 Binding="{Binding TaskType}" 
-                                                Width="*">
+                                                Width="100">
                             </DataGridTextColumn>
                             <DataGridTextColumn HeaderStyle="{StaticResource ColumnHeaderStyle}"
                                                 Header="Description" 
                                                 Binding="{Binding Description}" 
-                                                Width="Auto">
+                                                Width="*">
                             </DataGridTextColumn>
                             <DataGridTextColumn HeaderStyle="{StaticResource LastColumnHeaderStyle}"
                                                 Header="Status" 
                                                 Binding="{Binding Status}" 
-                                                Width="*">
+                                                Width="100">
                             </DataGridTextColumn>
                         </DataGrid.Columns>
                     </DataGrid>

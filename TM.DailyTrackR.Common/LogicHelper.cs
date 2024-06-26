@@ -9,9 +9,15 @@ public sealed class LogicHelper
     private LogicHelper()
     {
         LoginController = new LoginController();
+        ActivityController = new ActivityController();
+        ProjectTypeController = new ProjectTypeController();
     }
 
     public static LogicHelper Instance { get { return Lazy.Value; } }
 
     public LoginController LoginController { get; }
+
+    public ActivityController ActivityController { get; }
+
+    public ProjectTypeController ProjectTypeController { get; }
 }

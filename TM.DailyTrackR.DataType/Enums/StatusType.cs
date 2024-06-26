@@ -1,6 +1,6 @@
 ﻿namespace TM.DailyTrackR.DataType.Enums;
 
-public enum Status
+public enum StatusType
 {
     IN_PROGRESS = 1,
     ON_HOLD = 2,

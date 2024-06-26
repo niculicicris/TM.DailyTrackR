@@ -9,14 +9,14 @@ namespace TM.DailyTrackR.ViewModel;
 public sealed class LoginWindowViewModel : BindableBase
 {
     private readonly LoginController loginController;
-
     private string username;
+    private bool isLoading;
 
     public LoginWindowViewModel()
     {
-        loginController = LogicHelper.Instance.LoginController;
-        username = String.Empty;
-        LoginCommand = new DelegateCommand<PasswordBox>(Login);
+        this.loginController = LogicHelper.Instance.LoginController;
+        this.username = String.Empty;
+        this.LoginCommand = new DelegateCommand<PasswordBox>(Login);
     }
 
     public string Username
@@ -29,6 +29,7 @@ public sealed class LoginWindowViewModel : BindableBase
 
     private void Login(PasswordBox passwordBox)
     {
+        if (isLoading) return;
         var password = passwordBox.Password;
 
         if (!CanLogin(username, password))
@@ -37,16 +38,10 @@ public sealed class LoginWindowViewModel : BindableBase
             return;
         }
 
-        if (!loginController.Login(username, password))
-        {
-            ShowInvalidPasswordDialog();
-            return;
-        }
-
-        SwitchToMainWindow();
+        LoginAsync(password);
     }
 
-    private bool CanLogin(String username, String password)
+    private bool CanLogin(string username, string password)
     {
         if (username.Length == 0) return false;
         if (password.Length == 0) return false;
@@ -54,15 +49,34 @@ public sealed class LoginWindowViewModel : BindableBase
         return true;
     }
 
-    private void ShowInvalidPasswordDialog()
+    private async Task LoginAsync(string password)
     {
-        string errorMessage = "The entered username or password is not correct!";
-        ViewService.Instance.ShowDialog(new ErrorWindowViewModel(errorMessage));
+        isLoading = true;
+
+        var isLoggedIn = await loginController.Login(username, password); 
+
+        if (isLoggedIn)
+        {
+            await SwitchToMainWindowAsync();
+        } else
+        {
+            ShowInvalidPasswordDialog();
+        }
+
+        isLoading = false;
     }
 
-    private void SwitchToMainWindow()
+    private async Task SwitchToMainWindowAsync()
     {
-        ViewService.Instance.ShowWindow(new MainWindowViewModel());
+        MainWindowViewModel mainWindowViewModel = new MainWindowViewModel(username);
+        await mainWindowViewModel.InitializeAsync();
+
+        ViewService.Instance.ShowWindow(mainWindowViewModel);
         ViewService.Instance.CloseWindow(this);
+    }
+    private void ShowInvalidPasswordDialog()
+    {
+        var errorMessage = "The entered username or password is not correct!";
+        ViewService.Instance.ShowDialog(new ErrorWindowViewModel(errorMessage));
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace TM.DailyTrackR.DataType;
 
-public class ActivityDisplay
+public class DailyActivity
 {
     private int id;
     private int number;
@@ -9,7 +9,7 @@ public class ActivityDisplay
     private string description;
     private string status;
 
-    public ActivityDisplay(int id, int number, string projectType, string taskType, string description, string status)
+    public DailyActivity(int id, int number, string projectType, string taskType, string description, string status)
     {
         this.id = id;
         this.number = number;
