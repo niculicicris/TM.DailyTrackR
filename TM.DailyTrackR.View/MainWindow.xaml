@@ -190,6 +190,7 @@
                         </StackPanel>
                         <Button Grid.Column="1"
                                 Style="{StaticResource AddButtonStyle}"
+                                Command="{Binding CreateActivityCommand}"
                                 HorizontalAlignment="Right">
                         </Button>
                     </Grid>

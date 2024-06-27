@@ -53,11 +53,10 @@ public sealed class LoginWindowViewModel : BindableBase
     {
         isLoading = true;
 
-        var isLoggedIn = await loginController.Login(username, password); 
-
+        var isLoggedIn = loginController.Login(username, password);
         if (isLoggedIn)
         {
-            await SwitchToMainWindowAsync();
+            SwitchToMainWindowAsync();
         } else
         {
             ShowInvalidPasswordDialog();
@@ -66,14 +65,13 @@ public sealed class LoginWindowViewModel : BindableBase
         isLoading = false;
     }
 
-    private async Task SwitchToMainWindowAsync()
+    private void SwitchToMainWindowAsync()
     {
         MainWindowViewModel mainWindowViewModel = new MainWindowViewModel(username);
-        await mainWindowViewModel.InitializeAsync();
-
         ViewService.Instance.ShowWindow(mainWindowViewModel);
         ViewService.Instance.CloseWindow(this);
     }
+
     private void ShowInvalidPasswordDialog()
     {
         var errorMessage = "The entered username or password is not correct!";

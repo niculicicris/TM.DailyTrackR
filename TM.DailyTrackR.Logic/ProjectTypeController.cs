@@ -1,15 +1,44 @@
-﻿using TM.DailyTrackR.DataType;
+﻿using System.Data.SqlClient;
+using System.Data;
+using TM.DailyTrackR.DataType;
+using TM.DailyTrackR.DataType.Constant;
 
 namespace TM.DailyTrackR.Logic;
 
 public class ProjectTypeController
 {
-    public async Task<List<ProjectType>> GetAllProjectTypes()
+    public List<ProjectType> GetAllProjectTypes()
     {
-        return new List<ProjectType>()
+        var projectTypes = new List<ProjectType>();
+        var insertProcedureName = "tm.GetAllProjectTypes";
+
+        using (SqlConnection connection = new SqlConnection(Connection.ConnectionString))
         {
-            new ProjectType(1, "Administrative"),
-            new ProjectType(1, "Marketing")
-        };
+            try
+            {
+                connection.Open();
+
+                using (SqlCommand command = new SqlCommand(insertProcedureName, connection))
+                {
+
+                    command.CommandType = CommandType.StoredProcedure;
+
+                    var reader = command.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        int id = reader.GetInt32("id");
+                        string description = reader.GetString("description");
+
+                        projectTypes.Add(new ProjectType(id, description));
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("An error occurred: " + ex.Message);
+            }
+        }
+
+        return projectTypes;
     }
 }

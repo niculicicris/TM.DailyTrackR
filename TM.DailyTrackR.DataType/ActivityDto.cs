@@ -6,17 +6,17 @@ public class ActivityDto
 {
     private int id;
     private int projectTypeId;
-    private TaskType taskType;
+    private ProjectTask task;
     private string description;
     private string username;
     private DateTime creationDate = DateTime.Now;
-    private StatusType status;
+    private Status status;
 
     public int Id { get => id; set => id = value; }
 
     public int ProjectTypeId { get => projectTypeId; set => projectTypeId = value; }
 
-    public TaskType TaskType { get => taskType; set => taskType = value; }
+    public ProjectTask Task { get => task; set => task = value; }
 
     public string Description { get => description; set => description = value; }
     
@@ -24,5 +24,5 @@ public class ActivityDto
 
     public DateTime CreationDate { get => creationDate; set => creationDate = value; }
 
-    public StatusType Status { get => status; set => status = value; }
+    public Status Status { get => status; set => status = value; }
 }

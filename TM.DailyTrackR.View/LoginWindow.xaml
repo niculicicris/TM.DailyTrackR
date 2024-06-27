@@ -26,6 +26,7 @@
         </Style>
 
         <Style x:Key="InputStyle" TargetType="TextBox">
+            <Setter Property="Margin" Value="0, 4, 0, 0"></Setter>
             <Setter Property="Padding" Value="10, 0"></Setter>
             <Setter Property="Background" Value="#f8f8f8"></Setter>
             <Setter Property="Foreground" Value="#4a4a49"></Setter>
@@ -35,6 +36,7 @@
         </Style>
 
         <Style x:Key="PasswordInputStyle" TargetType="PasswordBox">
+            <Setter Property="Margin" Value="0, 4, 0, 0"></Setter>
             <Setter Property="Padding" Value="10, 0"></Setter>
             <Setter Property="Background" Value="#f8f8f8"></Setter>
             <Setter Property="Foreground" Value="#4a4a49"></Setter>
@@ -94,16 +96,14 @@
                 <TextBlock Text="Username"></TextBlock>
                 <TextBox Style="{StaticResource InputStyle}" 
                          MaxLength="30"
-                         Text="{Binding Username}"
-                         Margin="0, 4, 0, 0">
+                         Text="{Binding Username}">
                 </TextBox>
             </StackPanel>
             <StackPanel Margin="0, 20, 0, 0">
                 <TextBlock Text="Password"></TextBlock>
                 <PasswordBox x:Name="PasswordBox" 
                              Style="{StaticResource PasswordInputStyle}"
-                             MaxLength="30"
-                             Margin="0, 4, 0, 0">
+                             MaxLength="30">
                 </PasswordBox>
             </StackPanel>
             <Button Style="{StaticResource ButtonStyle}"

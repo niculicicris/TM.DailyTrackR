@@ -14,6 +14,7 @@ public partial class App : Application
         ViewService.Instance.RegisterView(typeof(LoginWindowViewModel), typeof(LoginWindow));
         ViewService.Instance.RegisterView(typeof(MainWindowViewModel), typeof(MainWindow));
         ViewService.Instance.RegisterView(typeof(ErrorWindowViewModel), typeof(ErrorWindow));
+        ViewService.Instance.RegisterView(typeof(CreateActivityWindowViewModel), typeof(CreateActivityWindow));
 
         ViewService.Instance.ShowWindow(new LoginWindowViewModel());
     }

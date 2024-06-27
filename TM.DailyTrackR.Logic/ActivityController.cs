@@ -1,20 +1,19 @@
 ﻿using System.Data;
 using System.Data.SqlClient;
 using TM.DailyTrackR.DataType;
+using TM.DailyTrackR.DataType.Constant;
 using TM.DailyTrackR.DataType.Enums;
 
 namespace TM.DailyTrackR.Logic;
 
 public class ActivityController
 {
-    private string connectionString = @"Server=np:\\.\pipe\LOCALDB#9098F713\tsql\query;Database=TRACKER_DATA;Integrated Security=true;";
-
-    public async Task<List<DailyActivity>> GetDailyActivitiesAsync(string username, DateTime creationDate)
+    public List<DailyActivity> GetDailyActivities(string username, DateTime creationDate)
     {
         var dailyActivities = new List<DailyActivity>();
         var insertProcedureName = "tm.GetDailyActivities";
 
-        using (SqlConnection connection = new SqlConnection(connectionString))
+        using (SqlConnection connection = new SqlConnection(Connection.ConnectionString))
         {
             try
             {
@@ -50,29 +49,42 @@ public class ActivityController
         int id = reader.GetInt32("id");
         string projectType = reader.GetString("project_type");
         int taskTypeId = reader.GetInt32("task_type_id");
-        string taskType = GetTaskTypeName(taskTypeId);
+        ProjectTask task = new ProjectTask((TaskType) taskTypeId);
         string description = reader.GetString("description");
         int statusId = reader.GetInt32("status_id");
-        string status = GetStatusName(statusId);
+        Status status = new Status((StatusType) statusId);
 
-        return new DailyActivity(id, number, projectType, taskType, description, status);
+        return new DailyActivity(id, number, projectType, task.TaskDescription, description, status.StatusDescription);
     }
 
-    private string GetTaskTypeName(int taskTypeId)
+    public void CreateActivity(ActivityDto activity)
     {
-        if (taskTypeId == ((int) TaskType.FIX)) return "Fix";
-        if (taskTypeId == ((int) TaskType.NEW)) return "New";
+        var insertProcedureName = "tm.CreateActivity";
 
-        return "Unknown";
-    }
+        using (SqlConnection connection = new SqlConnection(Connection.ConnectionString))
+        {
+            try
+            {
+                connection.Open();
 
-    private string GetStatusName(int statusId)
-    {
-        if (statusId == ((int) StatusType.IN_PROGRESS)) return "In Progress";
-        if (statusId == ((int) StatusType.ON_HOLD)) return "On Hold";
-        if (statusId == ((int) StatusType.DONE)) return "Done";
+                using (SqlCommand command = new SqlCommand(insertProcedureName, connection))
+                {
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.Parameters.AddWithValue("@ProjectTypeId", activity.ProjectTypeId);
+                    command.Parameters.AddWithValue("@TaskTypeId", activity.Task.TaskId);
+                    command.Parameters.AddWithValue("@Description", activity.Description);
+                    command.Parameters.AddWithValue("@UserName", activity.Username);
+                    command.Parameters.AddWithValue("@CreationDate", activity.CreationDate);
+                    command.Parameters.AddWithValue("@StatusId", activity.Status.StatusId);
 
-        return "Unknown";
-
+                    command.ExecuteNonQuery();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("An error occurred: " + ex.Message);
+                throw new Exception(ex.Message);
+            }
+        }
     }
 }
