@@ -1,5 +1,6 @@
 ﻿using System.Data;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using TM.DailyTrackR.DataType;
 using TM.DailyTrackR.DataType.Constant;
 using TM.DailyTrackR.DataType.Enums;
@@ -11,7 +12,7 @@ public class ActivityController
     public List<DailyActivity> GetDailyActivities(string username, DateTime creationDate)
     {
         var dailyActivities = new List<DailyActivity>();
-        var insertProcedureName = "tm.GetDailyActivities";
+        var getProcedureName = "tm.GetDailyActivities";
 
         using (SqlConnection connection = new SqlConnection(Connection.ConnectionString))
         {
@@ -19,7 +20,7 @@ public class ActivityController
             {
                 connection.Open();
 
-                using (SqlCommand command = new SqlCommand(insertProcedureName, connection))
+                using (SqlCommand command = new SqlCommand(getProcedureName, connection))
                 {
                 
                     command.CommandType = CommandType.StoredProcedure;
@@ -30,7 +31,7 @@ public class ActivityController
 
                     while (reader.Read())
                     {
-                        var activity = ReadNextActivity(reader, dailyActivities.Count + 1);
+                        var activity = ReadNextDailyActivity(reader, dailyActivities.Count + 1);
                         dailyActivities.Add(activity);
                     }
                 }
@@ -44,7 +45,7 @@ public class ActivityController
         return dailyActivities;
     }
 
-    private DailyActivity ReadNextActivity(SqlDataReader reader, int number)
+    private DailyActivity ReadNextDailyActivity(SqlDataReader reader, int number)
     {
         int id = reader.GetInt32("id");
         string projectType = reader.GetString("project_type");
@@ -83,8 +84,78 @@ public class ActivityController
             catch (Exception ex)
             {
                 Console.WriteLine("An error occurred: " + ex.Message);
-                throw new Exception(ex.Message);
             }
         }
+    }
+
+    public void DeleteActivity(int id)
+    {
+        var deleteProcedureName = "tm.DeleteActivity";
+
+        using (SqlConnection connection = new SqlConnection(Connection.ConnectionString))
+        {
+            try
+            {
+                connection.Open();
+
+                using (SqlCommand command = new SqlCommand(deleteProcedureName, connection))
+                {
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.Parameters.AddWithValue("@Id", id);
+                    command.ExecuteNonQuery();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("An error occurred: " + ex.Message);
+            }
+        }
+    }
+
+    public List<OverviewActivity> GetOverviewActivities(DateTime creationDate)
+    {
+        var overviewActivities = new List<OverviewActivity>();
+        var getProcedureName = "tm.GetOverviewActivities";
+
+        using (SqlConnection connection = new SqlConnection(Connection.ConnectionString))
+        {
+            try
+            {
+                connection.Open();
+
+                using (SqlCommand command = new SqlCommand(getProcedureName, connection))
+                {
+
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.Parameters.AddWithValue("@SpecificDate", creationDate);
+
+                    var reader = command.ExecuteReader();
+
+                    while (reader.Read())
+                    {
+                        var activity = ReadNextOverviewActivity(reader, overviewActivities.Count + 1);
+                        overviewActivities.Add(activity);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("An error occurred: " + ex.Message);
+            }
+        }
+
+        return overviewActivities;
+    }
+
+    private OverviewActivity ReadNextOverviewActivity(SqlDataReader reader, int number)
+    {
+        int id = reader.GetInt32("id");
+        string projectType = reader.GetString("project_type");
+        string description = reader.GetString("description");
+        int statusId = reader.GetInt32("status_id");
+        Status status = new Status((StatusType) statusId);
+        string user = reader.GetString("user");
+
+        return new OverviewActivity(id, number, projectType, description, status.StatusDescription, user);
     }
 }

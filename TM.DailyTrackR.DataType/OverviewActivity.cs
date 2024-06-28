@@ -1,22 +1,22 @@
 ﻿namespace TM.DailyTrackR.DataType;
 
-public class DailyActivity
+public class OverviewActivity
 {
     private int id;
     private int number;
     private string projectType;
-    private string taskType;
     private string description;
     private string status;
+    private string user;
 
-    public DailyActivity(int id, int number, string projectType, string taskType, string description, string status)
+    public OverviewActivity(int id, int number, string projectType, string description, string status, string user)
     {
         this.id = id;
         this.number = number;
         this.projectType = projectType;
-        this.taskType = taskType;
         this.description = description;
         this.status = status;
+        this.user = user;
     }
 
     public int Id { get => id; }
@@ -25,9 +25,9 @@ public class DailyActivity
 
     public string ProjectType { get => projectType; }
 
-    public string TaskType { get => taskType; }
-
     public string Description { get => description; }
 
     public string Status { get => status; }
+
+    public string User { get => user; }
 }

@@ -153,6 +153,10 @@
             <Setter Property="BorderBrush" Value="Black"></Setter>
             <Setter Property="FontSize" Value="14"></Setter>
         </Style>
+        <Style x:Key="DeleteContextMenuStyle" TargetType="ContextMenu">
+            <Setter Property="Background" Value="#f8f8f8"></Setter>
+            <Setter Property="BorderBrush" Value="#abadb3"></Setter>
+        </Style>
     </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
@@ -197,9 +201,16 @@
                     <DataGrid Grid.Row="1" 
                               Style="{StaticResource DataGridStyle}"
                               ItemsSource="{Binding DailyActivities, Mode=OneWay}"
+                              SelectedItem="{Binding SelectedDailyActivity}"
                               IsReadOnly="True"
+                              SelectionMode="Single"
                               CanUserSortColumns="False"
                               AutoGenerateColumns="False">
+                        <DataGrid.ContextMenu>
+                            <ContextMenu Style="{StaticResource DeleteContextMenuStyle}">
+                                <MenuItem Header="Delete" Command="{Binding DeleteCommand}"></MenuItem>
+                            </ContextMenu>
+                        </DataGrid.ContextMenu>
                         <DataGrid.Columns>
                             <DataGridTextColumn HeaderStyle="{StaticResource FirstColumnHeaderStyle}" 
                                                 Header="No." 
@@ -232,6 +243,52 @@
             </TabItem>
             <TabItem Style="{StaticResource TabItemStyle}"
                      Header="Overview">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="*"></RowDefinition>
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0, 0, 0, 10">
+                        <TextBlock Text="Activities Date: "></TextBlock>
+                        <TextBlock Text="{Binding SelectedDate, StringFormat={}{0:dd/MM/yyyy}}"></TextBlock>
+                    </StackPanel>
+                    <DataGrid Grid.Row="1" 
+                              Style="{StaticResource DataGridStyle}"
+                              ItemsSource="{Binding OverviewActivities, Mode=OneWay}"
+                              IsReadOnly="True"
+                              SelectionMode="Single"
+                              CanUserSortColumns="False"
+                              AutoGenerateColumns="False">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn HeaderStyle="{StaticResource FirstColumnHeaderStyle}" 
+                                                Header="No." 
+                                                Binding="{Binding Number}" 
+                                                Width="50">
+                            </DataGridTextColumn>
+                            <DataGridTextColumn HeaderStyle="{StaticResource ColumnHeaderStyle}"
+                                                Header="Project type" 
+                                                Binding="{Binding ProjectType}" 
+                                                Width="100">
+                            </DataGridTextColumn>
+                            <DataGridTextColumn HeaderStyle="{StaticResource ColumnHeaderStyle}"
+                                                Header="Description" 
+                                                Binding="{Binding Description}" 
+                                                Width="*">
+                            </DataGridTextColumn>
+                            <DataGridTextColumn HeaderStyle="{StaticResource ColumnHeaderStyle}"
+                                                Header="Status" 
+                                                Binding="{Binding Status}" 
+                                                Width="100">
+                            </DataGridTextColumn>
+                            <DataGridTextColumn HeaderStyle="{StaticResource LastColumnHeaderStyle}"
+                                                Header="User" 
+                                                Binding="{Binding User}" 
+                                                Width="100">
+                            </DataGridTextColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
             </TabItem>
         </TabControl>
     </Grid>
