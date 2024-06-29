@@ -6,6 +6,6 @@ public class Connection
 
     public static string ConnectionString
     {
-        get => @"Server=np:\\.\pipe\LOCALDB#9AF58288\tsql\query;Database=TRACKER_DATA;Integrated Security=true;";
+        get => @"Server=np:\\.\pipe\LOCALDB#1AE6F52B\tsql\query;Database=TRACKER_DATA;Integrated Security=true;";
     }
 }

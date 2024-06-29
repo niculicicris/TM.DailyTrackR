@@ -158,4 +158,77 @@ public class ActivityController
 
         return new OverviewActivity(id, number, projectType, description, status.StatusDescription, user);
     }
+
+    public List<ExportActivity> GetExportActivities(DateTime startDate, DateTime endDate)
+    {
+        var exportActivities = new List<ExportActivity>();
+        var getProcedureName = "tm.GetExportActivities";
+
+        using (SqlConnection connection = new SqlConnection(Connection.ConnectionString))
+        {
+            try
+            {
+                connection.Open();
+
+                using (SqlCommand command = new SqlCommand(getProcedureName, connection))
+                {
+
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.Parameters.AddWithValue("@StartDate", startDate);
+                    command.Parameters.AddWithValue("@EndDate", endDate);
+
+                    var reader = command.ExecuteReader();
+
+                    while (reader.Read())
+                    {
+                        var activity = ReadNextExportActivity(reader);
+                        exportActivities.Add(activity);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("An error occurred: " + ex.Message);
+            }
+        }
+
+        return exportActivities;
+    }
+
+    private ExportActivity ReadNextExportActivity(SqlDataReader reader)
+    {
+        string projectType = reader.GetString("project_type");
+        string description = reader.GetString("description");
+        int taskTypeId = reader.GetInt32("task_type_id");
+        ProjectTask taskType = new ProjectTask((TaskType) taskTypeId);
+        int statusId = reader.GetInt32("status_id");
+        Status status = new Status((StatusType)statusId);
+
+        return new ExportActivity(projectType, description, taskType.TaskDescription, status.StatusDescription);
+    }
+
+    public void ChangeActivityStatus(int id, int statusId)
+    {
+        var updateProcedureName = "tm.ChangeActivityStatus";
+
+        using (SqlConnection connection = new SqlConnection(Connection.ConnectionString))
+        {
+            try
+            {
+                connection.Open();
+
+                using (SqlCommand command = new SqlCommand(updateProcedureName, connection))
+                {
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.Parameters.AddWithValue("@Id", id);
+                    command.Parameters.AddWithValue("@StatusId", statusId);
+                    command.ExecuteNonQuery();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("An error occurred: " + ex.Message);
+            }
+        }
+    }
 }

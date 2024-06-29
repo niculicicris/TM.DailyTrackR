@@ -1,7 +1,10 @@
-﻿using Prism.Commands;
+﻿using Microsoft.Win32;
+using Prism.Commands;
 using Prism.Mvvm;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.IO;
+using System.Text;
 using System.Windows.Media;
 using TM.DailyTrackR.Common;
 using TM.DailyTrackR.DataType;
@@ -18,6 +21,8 @@ public sealed class MainWindowViewModel : BindableBase
     private ObservableCollection<DailyActivity> dailyActivities;
     private DailyActivity selectedDailyActivity;
     private ObservableCollection<OverviewActivity> overviewActivities;
+    private DateTime selectedStartDate;
+    private DateTime selectedEndDate;
     private bool isLoading = false;
 
     public MainWindowViewModel(string currentUser)
@@ -31,8 +36,12 @@ public sealed class MainWindowViewModel : BindableBase
         this.selectedDailyActivity = null;
         this.overviewActivities = new ObservableCollection<OverviewActivity>();
         this.overviewActivities.AddRange(activityController.GetOverviewActivities(selectedDate));
+        this.selectedStartDate = selectedDate;
+        this.selectedEndDate = selectedDate;
         this.CreateActivityCommand = new DelegateCommand(CreateActivity, CanCreateActivity);
+        this.ChangeStatusCommand = new DelegateCommand(ChangeStatus);
         this.DeleteCommand = new DelegateCommand(Delete);
+        this.ExportCommand = new DelegateCommand(Export);
     }
 
     public string CurrentUser { get => currentUser; }
@@ -82,6 +91,18 @@ public sealed class MainWindowViewModel : BindableBase
         set => SetProperty(ref overviewActivities, value); 
     }
 
+    public DateTime SelectedStartDate
+    {
+        get => selectedStartDate;
+        set => SetProperty(ref selectedStartDate, value);
+    }
+
+    public DateTime SelectedEndDate
+    {
+        get => selectedEndDate;
+        set => SetProperty(ref selectedEndDate, value);
+    }
+
     public bool IsLoading
     {
         get => isLoading;
@@ -101,6 +122,17 @@ public sealed class MainWindowViewModel : BindableBase
         return !isLoading;
     }
 
+    public DelegateCommand ChangeStatusCommand { get; }
+
+    private void ChangeStatus()
+    {
+        if (isLoading) return;
+        if (selectedDailyActivity == null) return;
+
+        var changeViewModel = new ChangeStatusViewModel(this, selectedDailyActivity);
+        ViewService.Instance.ShowDialog(changeViewModel);
+    }
+
     public DelegateCommand DeleteCommand { get; }
 
     private void Delete()
@@ -110,5 +142,84 @@ public sealed class MainWindowViewModel : BindableBase
 
         var deleteViewModel = new DeleteWindowViewModel(dailyActivities, overviewActivities, selectedDailyActivity.Id);
         ViewService.Instance.ShowDialog(deleteViewModel);
+    }
+
+    public DelegateCommand ExportCommand { get; }
+
+    private void Export()
+    {
+        SaveFileDialog dialog = new SaveFileDialog();
+        string startDate = selectedStartDate.ToString("dd.MM.yyyy");
+        string endDate = selectedEndDate.ToString("dd.MM.yyyy");
+
+        dialog.FileName = $"TeamActivity_{startDate}_{endDate}";
+        dialog.DefaultExt = ".txt";
+        dialog.Filter = "Text documents (.txt)|*.txt";
+
+        Nullable<bool> result = dialog.ShowDialog();
+
+        if (result == true)
+        {
+            string fileName = dialog.FileName;
+            SaveExportFile(fileName, startDate, endDate);
+        }
+    }
+
+    private void SaveExportFile(string filename, string startDate, string endDate)
+    {
+        var contentBuilder = new StringBuilder();
+        var exportActivities = activityController.GetExportActivities(selectedStartDate, selectedEndDate);
+        var projectGroups = exportActivities.GroupBy(activity => activity.ProjectType);
+
+        contentBuilder.AppendLine($"Team Activity in the period {startDate} - {endDate}");
+        contentBuilder.AppendLine();
+
+        foreach (var projectGroup in projectGroups)
+        {
+            contentBuilder.AppendLine($"{projectGroup.Key}:");
+
+            var taskGroups = projectGroup.GroupBy(activity => activity.TaskType);
+            var newGroup = taskGroups.FirstOrDefault(group => group.Key != "Fix", null);
+            var fixGroup = taskGroups.FirstOrDefault(group => group.Key == "Fix", null);
+
+            if (newGroup != null)
+            {
+                newGroup.OrderBy(activity => activity.Status);
+
+                foreach (var activity in newGroup)
+                {
+                    if (activity.Status == "Done")
+                    {
+                        contentBuilder.AppendLine($"  - {activity.Description}");
+                    }
+                    else
+                    {
+                        contentBuilder.AppendLine($"  - {activity.Description} - {activity.Status}");
+                    }
+                }
+            }
+
+            if (fixGroup != null)
+            {
+                fixGroup.OrderBy(activity => activity.Status);
+                contentBuilder.AppendLine("  - Fixes:");
+
+                foreach (var activity in fixGroup)
+                {
+                    if (activity.Status == "Done")
+                    {
+                        contentBuilder.AppendLine($"    - {activity.Description}");
+                    }
+                    else
+                    {
+                        contentBuilder.AppendLine($"    - {activity.Description} - {activity.Status}");
+                    }
+                }
+            }
+
+            contentBuilder.AppendLine();
+        }
+
+        File.WriteAllText(filename, contentBuilder.ToString());
     }
 }
